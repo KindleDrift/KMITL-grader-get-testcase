@@ -18,12 +18,15 @@ def get_login_session(web_url, payload, session):
         if "Username or password is invalid" in text_content:
             print("Username or password is invalid")
             return None
-        elif "gay_burger" in text_content:
-            print("Broken Yee")
+        elif "Repeat log in" in text_content:
+            # Repeat log in
+            # previous machine logged out.
+            # Please log in AGAIN!
+            print("Login again")
             return None
         else:
-            session_id = session.cookies.get('ci_session')
-            print(f"Session ID: {session_id}")
+            # session_id = session.cookies.get('ci_session')
+            # print(f"Session ID: {session_id}")
             return session
     else:
         print(f"Login failed with status code: {response.status_code}")

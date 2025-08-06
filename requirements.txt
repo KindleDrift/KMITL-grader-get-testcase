@@ -11,6 +11,7 @@ ptyprocess==0.7.0
 Pygments==2.19.2
 pytest==8.4.1
 pytest-watch==4.2.0
+python-dotenv==1.1.1
 requests==2.32.4
 soupsieve==2.7
 typing_extensions==4.14.1

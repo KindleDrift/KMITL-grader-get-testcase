@@ -5,6 +5,8 @@ from fetch_exercises import get_lab_exercise
 import requests
 import pprint
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
 def get_user_info():
     username = input("Enter your student ID: ")
@@ -21,10 +23,10 @@ def get_user_info():
     return auth_payload
 
 
-def get_wanted_lab():
+def get_wanted_lab(session):
     lab_ex_to_get = {}
     while True:
-        commands = ['exit', 'add', 'rm', 'check', 'done', 'help']
+        commands = ['exit', 'add', 'rm', 'check', 'done', 'help', 'get-sesskey']
         input_str = input("get-lab > ")
 
         command_input = input_str.strip().lower()
@@ -41,6 +43,7 @@ def get_wanted_lab():
                 print(f"rm  [lab_no] [exercise_no]\tremove lab exercise no for the specified lab")
                 print(f"check\t\t\t\tgets the current exercise currently in the search check")
                 print(f"done\t\t\t\tget the exercise")
+                print(f"get-sesskey\t\t\tget the current session cookies")
             case "add":
                 if len(formatted_command) != 3:
                     print("Invalid argument count for \"add\", add takes [lab_no] and [exercise_no]")
@@ -83,17 +86,26 @@ def get_wanted_lab():
             case "done":
                 print("Getting the exercise...")
                 return lab_ex_to_get
+            case "get-sesskey":
+                print(session.cookies.get('ci_session'))
             case _:
                 print("Unknown commands specified, type \"help\" for list of commands")
 
 
 def main():
+    load_dotenv()
+
+    user_agent = os.getenv("USER_AGENT")
     init_url = "https://python.compro.kmitl.ac.th/25s1ood/index.php"
 
-    auth_payload = get_user_info()
+    auth_payload = None
+    if not os.getenv("CI_SESSION"):
+        auth_payload = get_user_info()
+    else:
+        auth_payload = str(os.getenv("CI_SESSION"))
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0",
+        "User-Agent": f"{user_agent}",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9",
         "Accept-Language": "en-US,en;q=0.5",
         "Accept-Encoding": "gzip, deflate, br",
@@ -105,25 +117,34 @@ def main():
     
     if isinstance(auth_payload, dict):
         get_login_session(init_url, auth_payload, session)
+        try: 
+            if not session.cookies.get('ci_session'):
+                # If ci_session is not obtained, try getting it again
+                get_login_session(init_url, auth_payload, session)
+        except:
+            get_login_session(init_url, auth_payload, session)
+        del auth_payload['password']
     else:
         session.cookies.set('ci_session', f'{auth_payload}')
 
-    pprint.pprint(session.headers)
-
-    # return
-
-    if session:
-        print("Login Success, now getting exercise question and testcase")
+    if session.cookies.get('ci_session'):
+        res = session.get("https://python.compro.kmitl.ac.th/25s1ood/index.php/student/exercise_home")
+        soup = BeautifulSoup(res.content, "html.parser")
+        if soup.find("h4"):
+            if soup.find("h4").text.strip() == "Access denied":
+                print("ci_session is expired or something went wrong")
+                return "CI_EXPIRED"
+        print("Login Success")
     else:
         print("Login Failed")
         return "FAIL"
 
-    lab_ex_to_get = get_wanted_lab()
+    lab_ex_to_get = get_wanted_lab(session)
 
-    for lab_no, lab, ex_no, exercise in get_lab_exercise("https://python.compro.kmitl.ac.th/25s1ood/index.php", lab_ex_to_get, session):
+    for lab_no, lab, ex_no, exercise in get_lab_exercise(init_url, lab_ex_to_get, session):
         s = f"# Lab: {lab}\n" + f"{exercise.to_markdown_format()}"
-        new_dir = Path(f'ch{lab_no}')
-        new_dir.mkdir(exist_ok=True)
+        new_dir = Path(f'../testcases/ch{lab_no}')
+        new_dir.mkdir(parents=True, exist_ok=True)
         new_file = new_dir / f'ex0{ex_no}.md'
         new_file.write_text(s)
 

@@ -27,7 +27,7 @@ class Exercise:
 
 
 def get_available_lab(web_url, session):
-    exercise_home = f"https://python.compro.kmitl.ac.th/25s1ood/index.php/student/exercise_home"
+    exercise_home = f"{web_url}/student/exercise_home"
 
     available_lab_with_name = {}
 
@@ -68,7 +68,7 @@ def get_available_lab(web_url, session):
 
 
 def get_lab_exercise(web_url, lab_exercise_to_get, session):
-    exercise_page = f"https://python.compro.kmitl.ac.th/25s1ood/index.php/student/lab_exercise"
+    exercise_page = f"{web_url}/student/lab_exercise"
 
     available_lab = get_available_lab(web_url, session)
     # Delay 5 second
@@ -102,17 +102,4 @@ def get_exercise_info(web_url, session):
 
 
 if __name__ == "__main__":
-    # print(get_exercise_info("https://python.compro.kmitl.ac.th/25s1ood/index.php", "sad"), end='')
-    # response = ""
-    # with open("KCE_DS_Student.html", 'rb') as f:
-    #     response = f.read()
-
-    # soup = BeautifulSoup(response, "html.parser")
-
-    # divs = soup.find_all("div", class_="panel")
-    # print(divs)
-
-    session = requests.Session()
-    new = session.get("https://www.google.com/")
-
-    print(new.content)
+    print("hello")
