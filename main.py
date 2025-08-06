@@ -8,6 +8,9 @@ from pathlib import Path
 
 def get_user_info():
     username = input("Enter your student ID: ")
+    if username == "use_session_auth":
+        return getpass("Enter your ci_session: ")
+
     password = getpass("Enter your password: ")
 
     auth_payload = {
@@ -85,16 +88,29 @@ def get_wanted_lab():
 
 
 def main():
-    custom_user_agent = "Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0"
     init_url = "https://python.compro.kmitl.ac.th/25s1ood/index.php"
 
     auth_payload = get_user_info()
 
     headers = {
-        'User-Agent': custom_user_agent
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:141.0) Gecko/20100101 Firefox/141.0",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1", 
     }
+    session = requests.Session()
+    session.headers = headers
+    
+    if isinstance(auth_payload, dict):
+        get_login_session(init_url, auth_payload, session)
+    else:
+        session.cookies.set('ci_session', f'{auth_payload}')
 
-    session = get_login_session(init_url, auth_payload, headers=headers)
+    pprint.pprint(session.headers)
+
+    # return
 
     if session:
         print("Login Success, now getting exercise question and testcase")
