@@ -3,7 +3,7 @@ import requests
 import time
 import pprint
 
-DELAY_CONST = 5
+DELAY_CONST = 2
 
 class Exercise:
     def __init__(self, title, description, testcase):
@@ -94,8 +94,12 @@ def get_exercise_info(web_url, session):
     description = soup.find('div', class_="panel-body").get_text()
     testcases = soup.find_all('textarea')
 
+    filtered_testcases = [
+        testcase for testcase in testcases if 'id' not in testcase.attrs or testcase['id'] != 'sourcecode_content'
+    ]
+
     test_list = []
-    for testcase in testcases:
+    for testcase in filtered_testcases:
         test_list.append(testcase.get_text())
     
     return Exercise(question_title, description, test_list)
