@@ -1,4 +1,4 @@
-# get-testcase
+# KMITL-grader-get-testcase
 
 A simple Python CLI tool to get testcases from the KMITL Programming Lab web.
 
