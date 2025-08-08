@@ -92,7 +92,7 @@ def get_exercise_info(web_url, session):
 
     question_title = soup.find('h2').get_text()
     description = soup.find('div', class_="panel-body").get_text()
-    testcases = soup.find_all('textarea', class_="testcase")
+    testcases = soup.find_all('textarea')
 
     test_list = []
     for testcase in testcases:
