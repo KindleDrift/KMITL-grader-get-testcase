@@ -3,7 +3,7 @@ import requests
 import time
 import pprint
 
-DELAY_CONST = 2
+DELAY_CONST = 1
 
 class Exercise:
     def __init__(self, title, description, testcase):
@@ -71,7 +71,7 @@ def get_lab_exercise(web_url, lab_exercise_to_get, session):
     exercise_page = f"{web_url}/student/lab_exercise"
 
     available_lab = get_available_lab(web_url, session)
-    # Delay 5 second
+    
     time.sleep(DELAY_CONST)
     for lab, exercises in lab_exercise_to_get.items():
         if lab in available_lab:
