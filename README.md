@@ -74,7 +74,7 @@ Example usage:
     rm 1 2,3
     ```
 
-4. To check, current exercise to import to markdown.
+4. To check the current exercise testcase to scrape (when you done using `add`).
     ```
     check
     ```
