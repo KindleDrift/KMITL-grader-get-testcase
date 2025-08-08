@@ -1,4 +1,4 @@
-# get-testcase
+# KMITL-grader-get-testcase
 
 A simple Python CLI tool to get testcases from the KMITL Programming Lab web.
 
@@ -74,7 +74,7 @@ Example usage:
     rm 1 2,3
     ```
 
-4. To check, current exercise to import to markdown.
+4. To check the current exercise testcase to scrape (when you done using `add`).
     ```
     check
     ```
